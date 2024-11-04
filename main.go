@@ -44,19 +44,19 @@ var cameraMode = FourCC{
 
 var controlNames = map[v4l2.CtrlID]ControlInfo{
 	// Camera Controls
-	v4l2.CtrlCameraExposureAuto:         ControlInfo{"auto_exposure", "Auto Exposure", false},
-	v4l2.CtrlCameraExposureAutoPriority: ControlInfo{"exposure_dynamic_framerate", "Exposure Dynamic Framerate", false},
-	v4l2.CtrlCameraExposureAbsolute:     ControlInfo{"exposure", "Exposure Absolute", true},
+	v4l2.CtrlCameraExposureAuto:         {"auto_exposure", "Auto Exposure", false},
+	v4l2.CtrlCameraExposureAutoPriority: {"exposure_dynamic_framerate", "Exposure Dynamic Framerate", false},
+	v4l2.CtrlCameraExposureAbsolute:     {"exposure", "Exposure Absolute", true},
 
 	// User Controls
-	v4l2.CtrlAutoWhiteBalance:        ControlInfo{"auto_white_balance", "Auto White Balance", false},
-	v4l2.CtrlBrightness:              ControlInfo{"brightness", "Brightness", true},
-	v4l2.CtrlContrast:                ControlInfo{"contrast", "Contrast", true},
-	v4l2.CtrlGamma:                   ControlInfo{"gamma", "Gamma", true},
-	v4l2.CtrlHue:                     ControlInfo{"hue", "Hue", true},
-	v4l2.CtrlSaturation:              ControlInfo{"saturation", "Saturation", true},
-	v4l2.CtrlSharpness:               ControlInfo{"sharpness", "Sharpness", true},
-	v4l2.CtrlWhiteBalanceTemperature: ControlInfo{"whitebalancetemperature", "White Balance Temperature", true},
+	v4l2.CtrlAutoWhiteBalance:        {"auto_white_balance", "Auto White Balance", false},
+	v4l2.CtrlBrightness:              {"brightness", "Brightness", true},
+	v4l2.CtrlContrast:                {"contrast", "Contrast", true},
+	v4l2.CtrlGamma:                   {"gamma", "Gamma", true},
+	v4l2.CtrlHue:                     {"hue", "Hue", true},
+	v4l2.CtrlSaturation:              {"saturation", "Saturation", true},
+	v4l2.CtrlSharpness:               {"sharpness", "Sharpness", true},
+	v4l2.CtrlWhiteBalanceTemperature: {"whitebalancetemperature", "White Balance Temperature", true},
 }
 
 var controlValues = map[string]int{
