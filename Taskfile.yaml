@@ -1,0 +1,52 @@
+---
+version: '3'
+
+env:
+  GOPATH: '{{ .GOPATH }}'
+  EXECUTABLE: cameratest
+  BINDIR: bin
+  DISTDIR: dist
+  PKGDIR: camera-tester
+  PKGNAME: cameratest
+
+tasks:
+  build:
+    cmds:
+      - go build -o {{ .BINDIR }}/{{ .EXECUTABLE }} -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -trimpath main.go
+
+  debug:
+    cmds:
+      - go build -o {{ .BINDIR }}/{{ .EXECUTABLE }} -race -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -trimpath main.go
+
+  clean:
+    cmds:
+      - rm -f {{ .BINDIR }}/{{ .EXECUTABLE }} || true
+      - rm -f {{ .BINDIR }}/{{ .PKGNAME }}*.deb || true
+      - rm -f {{ .DISTDIR }}/{{ .PKGDIR }}/usr/bin/{{ .EXECUTABLE }} || true
+      - rm -f {{ .DISTDIR }}/{{ .PKGDIR }}/usr/local/lib/* || true
+
+  package:
+    cmds:
+      - task: clean
+      - task: build
+      - cp bin/{{ .EXECUTABLE }} {{ .DISTDIR }}/{{ .PKGDIR }}/usr/bin
+      - find /usr/local/lib -type l -name 'libopencv_*.so.409' -exec sh -c 'cp "{}" {{ .DISTDIR }}/{{ .PKGDIR }}/usr/local/lib/$(basename "{}")' \;
+      - task: package-version
+      - task: package-size
+      - dpkg-deb --root-owner-group --build {{ .DISTDIR }}/{{ .PKGDIR }} {{ .BINDIR }}
+
+  package-version:
+    internal: true
+    cmds:
+      - sed -i -E 's/^(Version:\s).+$/\1{{ .VERSION_NUMBER }}/' {{ .DISTDIR }}/{{ .PKGDIR }}/DEBIAN/control
+    vars:
+      VERSION_NUMBER:
+        sh: git describe --tags --dirty | sed  -e 's/-dirty$//' -e 's/^v//'
+
+  package-size:
+    internal: true
+    cmds:
+      - sed -i -E 's/^(Installed-Size:\s).+$/\1{{ .INSTALLED_SIZE }}/' {{ .DISTDIR }}/{{ .PKGDIR }}/DEBIAN/control
+    vars:
+      INSTALLED_SIZE:
+        sh: du -kc {{ .DISTDIR }}/{{ .PKGDIR }}/* --exclude {{ .PKGNAME }}.deb --exclude DEBIAN | tail -1 | cut -f1

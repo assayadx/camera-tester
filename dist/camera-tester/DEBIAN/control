@@ -1,0 +1,8 @@
+Package: camera-tester
+Version: 0.1
+Architecture: amd64
+Depends: udev
+Priority: optional
+Installed-Size: 5980
+Maintainer: Trent Clowater trent@assaya.com
+Description: Assaya iaX Camera tester.
