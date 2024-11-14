@@ -30,7 +30,7 @@ tasks:
       - task: clean
       - task: build
       - cp bin/{{ .EXECUTABLE }} {{ .DISTDIR }}/{{ .PKGDIR }}/usr/bin
-      - find /usr/local/lib -type l -name 'libopencv_*.so.409' -exec sh -c 'cp "{}" {{ .DISTDIR }}/{{ .PKGDIR }}/usr/local/lib/$(basename "{}")' \;
+      - find /usr/local/lib -type l -name 'libopencv_*.so.410' -exec sh -c 'cp "{}" {{ .DISTDIR }}/{{ .PKGDIR }}/usr/local/lib/$(basename "{}")' \;
       - task: package-version
       - task: package-size
       - dpkg-deb --root-owner-group --build {{ .DISTDIR }}/{{ .PKGDIR }} {{ .BINDIR }}

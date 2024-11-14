@@ -75,7 +75,7 @@ var fixValue bool
 func main() {
 	// Define and parse the command-line flags for mode and exposure
 	modeFlag := flag.String("mode", "mjpg", "Mode: mjpg or yuyv")
-	exposureFlag := flag.Int("exposure", 512, "Exposure value")
+	exposureFlag := flag.Int("exposure", 512, "Exposure value: 20 to 10000")
 	fixFlag := flag.Bool("fix", false, "Fix the exposure value")
 	flag.Parse()
 
@@ -178,9 +178,6 @@ func main() {
 			log.Println("Empty frame:", frameCount)
 			continue
 		}
-
-		//// Convert the frame to BGR color format
-		//gocv.CvtColor(frame, &frame, gocv.ColorBGRToRGB)
 
 		// Display the frame in the window
 		window.IMShow(frame)

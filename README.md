@@ -1,15 +1,23 @@
-To run the application in YUYV mode:
+# Usage
+
+To run the application in `yuyv` mode with `exposure` 2048:
 
 ```shell
-go run main.go -mode=yuyv 
-```
+go run main.go -mode=yuyv -exposure=2048
 
-To run the application in MJPG mode:
+To run the application in `mjpg` mode with `exposure` 2048:
 
 ```shell
-go run main.go -mode=mjpg
+go run main.go -mode=mjpg -exposure=2048
 
 ```
+Sometimes the exposure will not get set correctly. To fix this, you can add the `fix` command option:
+
+```shell
+go run main.go -mode=yuyv -exposure=2048 -fix
+```
+
+# Errors
 
 If the select() timeout error occurs, it will look like this:
 
