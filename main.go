@@ -25,11 +25,11 @@ type FourCC struct {
 	yuyv int
 }
 
-// Replace these with your specific vendor and model IDs
-const (
-	vendorID = "1bcf" // Example vendor ID for Logitech
-	modelID  = "0b09" // Example model ID for a Logitech camera
-)
+// New camera
+//const (
+//	vendorID = "1bcf" // Example vendor ID for Logitech
+//	modelID  = "0b09" // Example model ID for a Logitech camera
+//)
 
 // Original camera
 //const (
@@ -76,6 +76,8 @@ func main() {
 	// Define and parse the command-line flags for mode and exposure
 	modeFlag := flag.String("mode", "mjpg", "Mode: mjpg or yuyv")
 	exposureFlag := flag.Int("exposure", 512, "Exposure value: 20 to 10000")
+	vendorID := flag.String("vid", "1bcf", "USB Vendor ID")
+	modelID := flag.String("pid", "0b09", "USB Product ID")
 	fixFlag := flag.Bool("fix", false, "Fix the exposure value")
 	flag.Parse()
 
@@ -108,7 +110,7 @@ func main() {
 	}
 
 	// Find the camera device path
-	cameraDevice, err := devicePath(vendorID, modelID)
+	cameraDevice, err := devicePath(*vendorID, *modelID)
 	if err != nil {
 		log.Println("Error:", err.Error())
 		return
@@ -323,7 +325,7 @@ func deviceState(devicePath string) error {
 			if getControl(videoDevice, v4l2.CtrlCameraExposureAbsolute) != exposureValue {
 				logMessage("Exposure", exposureValue, getControl(videoDevice, v4l2.CtrlCameraExposureAbsolute))
 			} else {
-				fmt.Println("Exposure adjusted successfully.")
+				log.Println("Exposure adjusted successfully.")
 			}
 		}
 	}
