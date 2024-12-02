@@ -16,7 +16,7 @@ $ make install
 
 # Usage
 
-To run the application in `yuyv` mode with `exposure` 2048:
+To run the application in `mjpg` mode with `exposure` 2048:
 
 ```shell
 $ task build
