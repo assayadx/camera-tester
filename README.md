@@ -3,6 +3,7 @@
 To build this application the following dependencies are required:
 
 ```shell
+$ sudo snap install task --classic
 $ go get gocv.io/x/gocv
 ```
 
