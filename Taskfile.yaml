@@ -2,51 +2,64 @@
 version: '3'
 
 env:
+  RELEASE_NAME:
+    sh: grep VERSION_CODENAME /etc/os-release | cut -d'=' -f2
+  VERSION_NUMBER:
+    sh: git describe --tags --dirty | sed  -e 's/-dirty$//' -e 's/^v//'
   GOPATH: '{{ .GOPATH }}'
+  PACKAGE: camera-tester
   EXECUTABLE: cameratest
   BINDIR: bin
   DISTDIR: dist
-  PKGDIR: camera-tester
-  PKGNAME: cameratest
+  PKGDIR: '{{ .DISTDIR }}/{{ .RELEASE_NAME }}/{{ .PACKAGE }}'
 
 tasks:
   build:
     cmds:
+      - task: clean-executable
       - go build -o {{ .BINDIR }}/{{ .EXECUTABLE }} -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -trimpath main.go
 
   debug:
     cmds:
+      - task: clean-executable
       - go build -o {{ .BINDIR }}/{{ .EXECUTABLE }} -race -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -trimpath main.go
 
   clean:
     cmds:
-      - rm -f {{ .BINDIR }}/{{ .EXECUTABLE }} || true
+      - task: clean-executable
       - rm -f {{ .BINDIR }}/{{ .PKGNAME }}*.deb || true
-      - rm -f {{ .DISTDIR }}/{{ .PKGDIR }}/usr/bin/{{ .EXECUTABLE }} || true
-      - rm -f {{ .DISTDIR }}/{{ .PKGDIR }}/usr/local/lib/* || true
+      - rm -f {{ .DISTDIR }}/*/{{ .PACKAGE }}/usr/bin/{{ .EXECUTABLE }} || true
+      - rm -f {{ .DISTDIR }}/*/{{ .PACKAGE }}/usr/local/lib/* || true
+
+  clean-executable:
+    internal: true
+    cmds:
+      - rm -f {{ .BINDIR }}/{{ .EXECUTABLE }} || true
+
+  deb-create:
+    internal: true
+    cmds:
+      - dpkg-deb --root-owner-group --build {{ .PKGDIR }} {{ .BINDIR }}/{{ .PACKAGE }}_{{.VERSION_NUMBER}}_amd64_{{ .RELEASE_NAME }}.deb
+
+  deb-size:
+    internal: true
+    cmds:
+      - sed -i -E 's/^(Installed-Size:\s).+$/\1{{ .INSTALLED_SIZE }}/' {{ .PKGDIR }}/DEBIAN/control
+    vars:
+      INSTALLED_SIZE:
+        sh: du -kc {{ .PKGDIR }}/* --exclude {{ .PKGNAME }}.deb --exclude DEBIAN | tail -1 | cut -f1
+
+  deb-version:
+    internal: true
+    cmds:
+      - sed -i -E 's/^(Version:\s).+$/\1{{ .VERSION_NUMBER }}/' {{ .PKGDIR }}/DEBIAN/control
 
   package:
     cmds:
       - task: clean
       - task: build
-      - cp bin/{{ .EXECUTABLE }} {{ .DISTDIR }}/{{ .PKGDIR }}/usr/bin
-      - find /usr/local/lib -type l -name 'libopencv_*.so.410' -exec sh -c 'cp "{}" {{ .DISTDIR }}/{{ .PKGDIR }}/usr/local/lib/$(basename "{}")' \;
-      - task: package-version
-      - task: package-size
-      - dpkg-deb --root-owner-group --build {{ .DISTDIR }}/{{ .PKGDIR }} {{ .BINDIR }}
-
-  package-version:
-    internal: true
-    cmds:
-      - sed -i -E 's/^(Version:\s).+$/\1{{ .VERSION_NUMBER }}/' {{ .DISTDIR }}/{{ .PKGDIR }}/DEBIAN/control
-    vars:
-      VERSION_NUMBER:
-        sh: git describe --tags --dirty | sed  -e 's/-dirty$//' -e 's/^v//'
-
-  package-size:
-    internal: true
-    cmds:
-      - sed -i -E 's/^(Installed-Size:\s).+$/\1{{ .INSTALLED_SIZE }}/' {{ .DISTDIR }}/{{ .PKGDIR }}/DEBIAN/control
-    vars:
-      INSTALLED_SIZE:
-        sh: du -kc {{ .DISTDIR }}/{{ .PKGDIR }}/* --exclude {{ .PKGNAME }}.deb --exclude DEBIAN | tail -1 | cut -f1
+      - cp bin/{{ .EXECUTABLE }} {{ .PKGDIR }}/usr/bin
+      - find /usr/local/lib -type l -name 'libopencv_*.so.410' -exec sh -c 'cp "{}" {{ .PKGDIR }}/usr/local/lib/$(basename "{}")' \;
+      - task: deb-version
+      - task: deb-size
+      - task: deb-create

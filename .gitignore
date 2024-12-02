@@ -1,5 +1,11 @@
+# Keep empty directories containing .keep files
+!.keep
+
+# Editor directories
 .idea
-/bin/cameratest
-/dist/iaxctrl/usr/bin/cameratest
-/dist/iaxctrl/usr/local/lib/libopencv*
 .vscode
+
+# Build output directories
+bin/*
+dist/*/camera-tester/usr/bin/cameratest
+dist/*/camera-tester/usr/local/lib/libopencv*

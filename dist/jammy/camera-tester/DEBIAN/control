@@ -1,0 +1,8 @@
+Package: camera-tester
+Version: 0.3
+Architecture: amd64
+Depends: udev, libdc1394-25, libavcodec58, libavformat58, libswscale5, libtbb12
+Priority: optional
+Installed-Size: 92928
+Maintainer: Trent Clowater trent@assaya.com
+Description: Assaya iaX Camera tester.
