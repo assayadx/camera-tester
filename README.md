@@ -23,8 +23,9 @@ $ ./bin/cameratest -mode=mjpg -exposure=2048
 ```
 
 ## Options
-* `-mode=<value>` - Output mode. Options are `yuyv` and `mjpg`.
-* `-exposure=<value>` - Exposure value (`20` to `10000`). Recommend one of `20`, `512`, `1024`, `2048`, `4096`, or `8192`.
+* `-mode=<value>` - Output mode. Options are `yuyv` and `mjpg`. No default, must be set.
+* `-exposure=<value>` - Exposure value (`20` to `10000`). Default is `512`. Recommend one of `20`, `512`, `1024`, `2048`, `4096`, or `8192`.
+* `-delay=<value>` - Delay to allow camera to initialize after changing properties (`0` to `10000` milliseconds). Default is `0`.
 * `-vid=<value>` - Camera USB Vendor ID (in hexadecimal). Default is `1bcf` (Fangtec 2nd generation camera).
 * `-pid=<value>` - Camera USB Product ID (in hexadecimal). Default is `0b09` (Fangtec 2nd generation camera).
 * `-fix` - If the exposure is not set correctly, this will attempt to fix it.

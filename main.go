@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type ControlInfo struct {
@@ -73,6 +74,7 @@ func main() {
 	// Define and parse the command-line flags for mode and exposure
 	modeFlag := flag.String("mode", "mjpg", "Mode: mjpg or yuyv")
 	exposureFlag := flag.Int("exposure", 512, "Exposure value: 20 to 10000")
+	delayFlag := flag.Int("delay", 100, "Delay in milliseconds")
 	vendorID := flag.String("vid", "1bcf", "USB Vendor ID")
 	modelID := flag.String("pid", "0b09", "USB Product ID")
 	fixFlag := flag.Bool("fix", false, "Fix the exposure value")
@@ -99,6 +101,13 @@ func main() {
 		exposureValue = *exposureFlag
 	}
 
+	switch {
+	case *delayFlag < 0:
+		*delayFlag = 0
+	case *delayFlag > 10000:
+		*delayFlag = 10000
+	}
+
 	switch *fixFlag {
 	case true:
 		fixValue = true
@@ -121,6 +130,9 @@ func main() {
 		log.Println("Error:", err.Error())
 		return
 	}
+
+	// Add a delay to allow the camera to initialize.
+	time.Sleep(time.Duration(*delayFlag) * time.Millisecond)
 
 	// Open a video capture device (0 is usually the default USB camera)
 	webcam, err := gocv.OpenVideoCapture(cameraDevice)
