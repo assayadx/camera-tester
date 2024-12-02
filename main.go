@@ -8,6 +8,7 @@ import (
 	"github.com/vladimirvivien/go4vl/v4l2"
 	"gocv.io/x/gocv"
 	"log"
+	"math"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -25,17 +26,13 @@ type FourCC struct {
 	yuyv int
 }
 
-// New camera
-//const (
-//	vendorID = "1bcf" // Example vendor ID for Logitech
-//	modelID  = "0b09" // Example model ID for a Logitech camera
-//)
-
 // Original camera
-//const (
-//	vendorID = "058f" // Example vendor ID for Logitech
-//	modelID  = "3822" // Example model ID for a Logitech camera
-//)
+//	vendorID = "058f"
+//	modelID  = "3822"
+
+// New camera
+//	vendorID = "1bcf"
+//	modelID  = "0b09"
 
 var cameraMode = FourCC{
 	mjpg: 1196444237,
@@ -97,7 +94,7 @@ func main() {
 	case *exposureFlag < 20:
 		log.Fatalf("Exposure value must be greater than 20. Please choose a value greater than 20.")
 	case *exposureFlag > 10000:
-		log.Fatalf("Exposure value must be less than 8192. Please choose a value less than 8192.")
+		log.Fatalf("Exposure value must be less than 10000. Please choose a value less than 10000.")
 	default:
 		exposureValue = *exposureFlag
 	}
@@ -168,7 +165,11 @@ func main() {
 
 	// Main loop to capture frames
 	for {
-		frameCount++
+		if frameCount < math.MaxInt64 {
+			frameCount++
+		} else {
+			frameCount = 0
+		}
 
 		// Read a frame from the camera
 		if ok := webcam.Read(&frame); !ok {
