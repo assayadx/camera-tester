@@ -1,27 +1,45 @@
+# Dependencies
+
+To build this application the following dependencies are required:
+
+```shell
+$ go get gocv.io/x/gocv
+```
+
+GoCV needs to be compiled first (change the version number to the one that is installed):
+
+```shell
+$ cd $GOPATH/pkg/mod/gocv.io/x/gocv@v0.39.0
+$ make install
+```
+
 # Usage
 
 To run the application in `yuyv` mode with `exposure` 2048:
 
 ```shell
-go run main.go -mode=yuyv -exposure=2048
-
-To run the application in `mjpg` mode with `exposure` 2048:
-
-```shell
-go run main.go -mode=mjpg -exposure=2048
-
+$ task build
+$ ./bin/cameratest -mode=mjpg -exposure=2048
 ```
-Sometimes the exposure will not get set correctly. To fix this, you can add the `fix` command option:
 
-```shell
-go run main.go -mode=yuyv -exposure=2048 -fix
-```
+## Options
+* `-mode=<value>` - Output mode. Options are `yuyv` and `mjpg`.
+* `-exposure=<value>` - Exposure value (`20` to `10000`). Recommend one of `20`, `512`, `1024`, `2048`, `4096`, or `8192`.
+* `-vid=<value>` - Camera USB Vendor ID (in hexadecimal). Default is `1bcf` (Fangtec 2nd generation camera).
+* `-pid=<value>` - Camera USB Product ID (in hexadecimal). Default is `0b09` (Fangtec 2nd generation camera).
+* `-fix` - If the exposure is not set correctly, this will attempt to fix it.
 
 # Errors
 
+Some example errors that have been observed with the current Fangtec 2nd generation camera firmware are shown below.
+This is not an exhaustive list, and other errors may occur until the firmware is fixed. Please report any errors not
+already listed below to `trent@assaya.com`, and include the log output and the camera firmware version.
+
+### Select Timeout
+
 If the select() timeout error occurs, it will look like this:
 
-```shell
+```text
 2024/11/04 14:41:06 Using camera device: /dev/video4
 2024/11/04 14:41:06 Identified CAM: /dev/video4
 2024/11/04 14:41:06 Initialized CAM: MJPG 1280x720 30fps
@@ -39,9 +57,11 @@ Gtk-Message: 14:41:06.756: Failed to load module "canberra-gtk-module"
 2024/11/04 14:41:56 ERROR reading frame: 5
 ```
 
+### Set Control Value
+
 If a set control error occurs it will look like this:
 
-```shell
+```text
 2024/11/04 15:18:44 Using camera device: /dev/video4
 2024/11/04 15:18:44 SetCamSetting Error: White Balance Temperature - device: /dev/video4: set control value: id 9963802: broken pipe
 2024/11/04 15:18:44 Identified CAM: /dev/video4
@@ -50,9 +70,11 @@ Gtk-Message: 15:18:44.453: Failed to load module "canberra-gtk-module"
 2024/11/04 15:18:44 Press ESC to exit.
 ```
 
+### Corrupt JPEG Data
+
 If corrupt JPEG data occurs it will look like this:
 
-```shell
+```text
 2024/11/04 15:47:22 Using camera device: /dev/video4
 2024/11/04 15:47:22 Identified CAM: /dev/video4
 2024/11/04 15:47:22 Initialized CAM: MJPG 1280x720 30fps
@@ -71,3 +93,14 @@ Gtk-Message: 15:47:22.610: Failed to load module "canberra-gtk-module"
 2024/11/04 15:47:44 ERROR reading frame: 661
 Corrupt JPEG data: premature end of data segment
 ```
+
+# Packaging
+
+To package the application for distribution on Ubuntu 22.04 LTS (Jammy Jellyfish) or Ubuntu 24.04 LTS (Noble Numbat)
+run the following command:
+
+```shell
+$ task package
+```
+
+Only Ubuntu 22.04 LTS (Jammy Jellyfish) and Ubuntu 24.04 LTS (Noble Numbat) are supported at this time.
